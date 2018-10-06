@@ -1,0 +1,50 @@
+@import "../../../node_modules/bootstrap/scss/bootstrap";
+
+body {
+  font-family: "Lucida Grande", Helvetica, Arial, sans-serif;
+}
+
+.messages {
+  @extend .bg-light;
+  max-height: 300px;
+  overflow-y: auto;
+
+  .to-me {
+    @extend .text-left;
+
+    .message {
+      @extend .bg-primary;
+      color: $light;
+    }
+  }
+
+  .by-me {
+    @extend .text-right;
+    -ms-text-align-last: right;
+    text-align-last: right;
+  }
+
+  .message-wrapper {
+    @extend .my-2;
+  }
+
+  .message {
+    @extend .bg-white, .border, .rounded, .shadow-sm, .p-2, .text-justify;
+    color: $dark;
+    display: inline-block;
+    max-width: 80%;
+    word-wrap: break-spaces;
+  }
+}
+
+.hidden {
+  display: none;
+}
+
+.go-down {
+  @extend .btn, .btn-outline-primary;
+  position: absolute;
+  right: 32px;
+  bottom: 16px;
+  z-index: 1;
+}
