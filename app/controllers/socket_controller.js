@@ -1,88 +1,140 @@
-exports.init = function (io) {
-    var users = {};
+var dataValidator = require('../helpers/io_data_validator');
 
-    function validator(action, data) {
-        var isValid = false;
-        switch (action) {
-            case 'chat_msg':
-
-        }
-    }
-
-    io.on('connection', function (socket) {
-        var uniqueId = guidGenerator();
-
-        function checkAuth() {
-            if (users[uniqueId] == null || !users[uniqueId].authenticated) {
-                logout();
+var controller = {
+    init: function (io) {
+        var sockets = {};
+        var users = {
+            "admin": {
+                "name": "Ibrokhim Shokirov",
+                "username": "admin",
+                "password": "123e45"
+            },
+            "test": {
+                "name": "Chloe Parker",
+                "username": "test",
+                "password": "test"
             }
-        }
-
-        function logout() {
-            if (users[uniqueId]) {
-                users[uniqueId].socket.disconnect();
-                delete users[uniqueId];
-            }
-        }
-
-        function guidGenerator() {
-            var S4 = function () {
-                return (((1 + Math.random()) * 0x10000) | 0).toString(16).substring(1);
-            };
-            return (S4() + S4() + '-' + S4() + '-' + S4() + '-' + S4() + '-' + S4() + S4() + S4());
-        }
-
-        console.log('[' + uniqueId + '] Connected! Waiting for auth!');
-
-        users[uniqueId] = {
-            id: uniqueId,
-            socket: socket,
-            authenticated: false,
-            authentication: null,
-            authAttempt: 0
         };
 
-        // Check authentication after 3 seconds
-        setTimeout(function () {
-            checkAuth(uniqueId);
-        }, 5000);
+        io.on('connection', function (socket) {
+            var uniqueId = guidGenerator();
+            var username = '';
 
-        socket.on('auth', function (data, cb) {
-            if (data.username === 'admin' && data.password === '123e45') {
-                users[uniqueId].authenticated = true;
-                users[uniqueId].authentication = {
-                    username: data.username,
-                    password: data.password
-                };
-
-                cb(true, {session_id: uniqueId});
-
-                console.log('[' + uniqueId + '] User Authenticated!');
-            } else {
-                users[uniqueId].authAttempt++;
-            }
-        });
-
-        socket.on('chat_msg', function (data) {
-            if (data.msg.length > 0) {
-                console.log('message to ' + data.to + ': ' + data.msg);
-                switch (data.to) {
-                    case 'sys':
-                        // do something
-                        break;
-                    case 'all':
-                        io.emit('chat_msg', {from: 'sys', msg: data.msg, to: data.to});
-                        break;
-                    default:
-                        // do something else
-                        break;
+            function checkAuth() {
+                if (sockets[uniqueId] == null || !sockets[uniqueId].authenticated) {
+                    logout();
                 }
             }
-        });
 
-        socket.on('disconnect', function () {
-            logout();
-            console.log('[' + uniqueId + '] Disconnected!');
+            function logout(msg = 'Successful logout!') {
+                socket.disconnect({msg: msg});
+                delete sockets[uniqueId];
+                delete sockets[username];
+            }
+
+            function login(usernm, passwd) {
+                if (users[usernm] && users[usernm].password === passwd) {
+                    sockets[uniqueId].authenticated = true;
+                    sockets[uniqueId].username = usernm;
+                    username = usernm;
+                    sockets[usernm] = sockets[uniqueId];
+
+                    return true;
+                }
+
+                return false;
+            }
+
+            function guidGenerator() {
+                /**
+                 * @return {string}
+                 */
+                var S4 = function () {
+                    return (((1 + Math.random()) * 0x10000) | 0).toString(16).substring(1);
+                };
+                return (S4() + S4() + '-' + S4() + '-' + S4() + '-' + S4() + '-' + S4() + S4() + S4());
+            }
+
+            console.log('[' + uniqueId.cyan + '] Client Connected! Waiting for authentication!');
+
+            sockets[uniqueId] = {
+                id: uniqueId,
+                socket: socket,
+                authenticated: false,
+                username: '',
+                authAttempt: 0
+            };
+
+            // Check authentication after 3 seconds
+            setTimeout(function () {
+                checkAuth(uniqueId);
+            }, 5000);
+
+            socket.on('auth', function (data, cb) {
+                if (!dataValidator.isValid('auth', data)) {
+                    console.log('[' + uniqueId.red + '] Invalid data for auth!')
+                } else if (sockets[uniqueId] && login(data.username, data.password)) {
+                    cb(true, {
+                        session_id: uniqueId,
+                        username: data.username
+                    });
+                    console.log('[' + uniqueId.green + '] Client Authenticated!');
+                } else {
+                    console.log('[' + uniqueId.red + '] Invalid Authentication!');
+
+                    if (sockets[uniqueId]) {
+                        sockets[uniqueId].authAttempt++;
+
+                        if (sockets[uniqueId].authAttempt > 2) {
+                            logout();
+                        }
+                    }
+
+                    cb(false, {msg: 'Invalid username or password!'});
+                }
+            });
+
+            socket.on('chat_msg', function (data) {
+                if (!dataValidator.isValid('chat_msg', data)) {
+                    console.log('[' + uniqueId.red + '] Invalid data for chat_msg!')
+                } else {
+                    console.log('message to ' + data.to + ': ' + data.msg);
+
+                    switch (data.to) {
+                        case 'sys':
+                            // do something
+                            break;
+                        case 'all':
+                            io.emit('chat_msg', {from: sockets[uniqueId].username, msg: data.msg, to: data.to});
+                            break;
+                        default:
+                            var chat_data = {
+                                from: username,
+                                msg: data.msg,
+                                to: data.to
+                            };
+
+                            if (sockets[data.to] && sockets[data.to].authenticated && sockets[data.to].socket.connected) {
+                                chat_data = {
+                                    from: username,
+                                    msg: data.msg,
+                                    to: sockets[data.to].username
+                                };
+                                sockets[data.to].socket.emit('chat_msg', chat_data);
+                            }
+
+                            sockets[uniqueId].socket.emit('chat_msg', chat_data);
+                            break;
+                    }
+                }
+            });
+
+            socket.on('disconnect', function () {
+                logout();
+                console.log('[' + uniqueId.gray + '] Client Disconnected!');
+            });
         });
-    });
+    }
 };
+
+module.exports = controller;

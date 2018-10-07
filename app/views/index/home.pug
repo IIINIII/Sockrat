@@ -11,6 +11,7 @@ block content
                         input(type="text", id="username", class="form-control bg-light", autocomplete="off", placeholder="Username", aria-label="Username", required="required")
                     div(class="input-group mb-3 mt-3")
                         input(type="password", id="password", class="form-control bg-light", autocomplete="off", placeholder="Password", aria-label="Password", aria-describedby="submitLogin", required="required")
+                    p#login_err_msg.text-center.hidden(style='color:red')
                     div(class="input-group mb-3 mt-3")
                         button(class="btn btn-block btn-outline-primary", type="submit", id="submitLogin") Login
     div(id="chat", class="hidden")
