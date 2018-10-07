@@ -5116,10 +5116,10 @@ button.bg-dark:focus {
   clip: auto;
   white-space: normal; }
 
-.shadow-sm, .messages .message {
+.shadow-sm, .card-header, .container > div > * > * {
   box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075) !important; }
 
-.shadow {
+.shadow, .messages .message {
   box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important; }
 
 .shadow-lg {
@@ -6363,7 +6363,7 @@ body {
   font-family: "Lucida Grande", Helvetica, Arial, sans-serif; }
 
 .messages {
-  max-height: 300px;
+  height: 300px;
   overflow-y: auto; }
   .messages .to-me .message {
     color: #f8f9fa; }

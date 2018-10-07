@@ -6,7 +6,7 @@ body {
 
 .messages {
   @extend .bg-light;
-  max-height: 300px;
+  height: 300px;
   overflow-y: auto;
 
   .to-me {
@@ -29,7 +29,7 @@ body {
   }
 
   .message {
-    @extend .bg-white, .border, .rounded, .shadow-sm, .p-2, .text-justify;
+    @extend .bg-white, .border, .rounded, .shadow, .p-2, .text-justify;
     color: $dark;
     display: inline-block;
     max-width: 80%;
@@ -47,4 +47,12 @@ body {
   right: 32px;
   bottom: 16px;
   z-index: 1;
+}
+
+.card-header {
+  @extend .shadow-sm;
+}
+
+.container > div > * > * {
+  @extend .shadow-sm;
 }

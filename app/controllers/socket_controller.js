@@ -1,4 +1,5 @@
 var dataValidator = require('../helpers/io_data_validator');
+var colors = require('colors');
 
 var controller = {
     init: function (io) {
@@ -78,6 +79,13 @@ var controller = {
                         session_id: uniqueId,
                         username: data.username
                     });
+
+                    socket.emit('chat_msg', {
+                        from: 'sys',
+                        to: username,
+                        msg: 'Welcome back, ' + users[username].name + '!'
+                    });
+
                     console.log('[' + uniqueId.green + '] Client Authenticated!');
                 } else {
                     console.log('[' + uniqueId.red + '] Invalid Authentication!');
