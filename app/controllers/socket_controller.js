@@ -14,6 +14,11 @@ var controller = {
                 "name": "Chloe Parker",
                 "username": "test",
                 "password": "test"
+            },
+            "maria": {
+                "name": "Maria Anderson",
+                "username": "maria",
+                "password": "maria"
             }
         };
 
@@ -73,7 +78,7 @@ var controller = {
 
             socket.on('auth', function (data, cb) {
                 if (!dataValidator.isValid('auth', data)) {
-                    console.log('[' + uniqueId.red + '] Invalid data for auth!')
+                    console.log('[' + uniqueId.red + '] Invalid data for auth!');
                 } else if (sockets[uniqueId] && login(data.username, data.password)) {
                     cb(true, {
                         session_id: uniqueId,
@@ -104,10 +109,10 @@ var controller = {
 
             socket.on('chat_msg', function (data) {
                 if (!dataValidator.isValid('chat_msg', data)) {
-                    console.log('[' + uniqueId.red + '] Invalid data for chat_msg!')
+                    console.log('[' + uniqueId.red + '] Invalid data for chat_msg!');
                 } else {
-                    console.log('message to ' + data.to + ': ' + data.msg);
-
+                    console.log('Message from ' + data.from + ' to ' + data.to + ':');
+                    console.log(data.msg);
                     switch (data.to) {
                         case 'sys':
                             // do something

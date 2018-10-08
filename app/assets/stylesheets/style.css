@@ -6367,9 +6367,6 @@ body {
   overflow-y: auto; }
   .messages .to-me .message {
     color: #f8f9fa; }
-  .messages .by-me {
-    -ms-text-align-last: right;
-    text-align-last: right; }
   .messages .message {
     color: #343a40;
     display: inline-block;

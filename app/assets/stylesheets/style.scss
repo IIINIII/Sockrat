@@ -20,8 +20,6 @@ body {
 
   .by-me {
     @extend .text-right;
-    -ms-text-align-last: right;
-    text-align-last: right;
   }
 
   .message-wrapper {

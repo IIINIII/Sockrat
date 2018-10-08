@@ -14,12 +14,13 @@ block content
                 .input-group.mb-3.mt-3
                     button#submitLogin.btn.btn-block.btn-outline-primary(type='submit') Login
     #chat.hidden
-        .card.bg-light
-            .card-header Ibrokhim Shokirov
-            #messages.card-body.messages
-                button.go-down
-                    i.fa.fa-chevron-down
         form#formSendMessage
+            .card.bg-light
+                .card-header
+                    input#msg_to.form-control.bg-light(type='text', autocomplete='off', placeholder='Receiver', required='required')
+                #messages.card-body.messages
+                    button.go-down.hidden
+                        i.fa.fa-chevron-down
             .input-group.input-group-lg.mb-3.mt-3
                 input#msg.form-control.bg-light(type='text', autocomplete='off', placeholder='Message', aria-label='Message', aria-describedby='submitMessage', required='required')
                 .input-group-append

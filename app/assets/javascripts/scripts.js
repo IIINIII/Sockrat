@@ -58,16 +58,23 @@ $(function () {
             }
         });
 
+        socket.on('disconnect', function () {
+            $('#chat').hide();
+            $('#formLogin').show();
+            $('#messages').text('');
+            user = null;
+        });
+
         event.preventDefault();
     });
 
-    $('#formSendMessage').submit(function (event) {
+    $('#formSendMessage').submit(event => {
         $('#msg').val((index, value) => {
             if (socket.connected) {
                 socket.emit('chat_msg', {
                     msg: value,
-                    to: 'test',
-                    from: 'any'
+                    to: $('#msg_to').val(),
+                    from: $('#username').val()
                 });
             }
 
